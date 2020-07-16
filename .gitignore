@@ -1,0 +1,8 @@
+# Ignore compilation units.
+/target
+
+# Only include the lock file on binary projects.
+Cargo.lock
+
+# Ignore backup files.
+*.rs.bk

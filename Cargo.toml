@@ -1,0 +1,5 @@
+[package]
+name = "zerotask-rust-lib-template"
+version = "0.1.0"
+authors = ["Sven Lechner <SirWindfield@users.noreply.github.com>"]
+edition = "2018"
