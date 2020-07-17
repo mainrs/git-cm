@@ -54,7 +54,8 @@ pub fn ask(types: HashMap<&str, &str>) -> SurveyResults {
         .with_prompt("Denote the scope of this change (compiler, runtime, stdlib, etc.):")
         .allow_empty(true)
         .interact()
-        .ok();
+        .ok()
+        .filter(|v: &String| !v.is_empty());
     results.scope = scope;
 
     let short_msg: String = Input::with_theme(&ColorfulTheme::default())
