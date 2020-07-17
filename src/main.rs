@@ -1,12 +1,12 @@
 use crate::{
-    config::parse_manifest,
+    cargo::parse_manifest,
     git::{commit, generate_commit_msg, DEFAULT_TYPES},
     questions::ask,
 };
 
 use std::{collections::HashMap, path::PathBuf};
 
-mod config;
+mod cargo;
 mod git;
 mod questions;
 
