@@ -28,6 +28,10 @@ name = "xyz"
 desc = "A custom command"
 ```
 
+## Example run
+
+![Example run GIF](.github/git-cm.gif)
+
 ## License
 
 Licensed under either of
