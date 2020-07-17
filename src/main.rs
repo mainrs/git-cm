@@ -29,15 +29,14 @@ fn main() {
 
             let repository_root = std::env::args().nth(1).unwrap_or_else(|| ".".to_string());
             let repository_path = PathBuf::from(&repository_root);
-            if !repository_path.as_path().exists() {
-                panic!(format!("Invalid path to repository: {}", repository_root));
+            if repository_path.as_path().exists() {
+                let survey = ask(types);
+                let commit_msg = generate_commit_msg(survey);
+                let hash = commit(commit_msg, repository_path).expect("Failed to create commit");
+                println!("Wrote commit: {}", hash);   
+            } else {
+                eprintln!("Invalid path to repository: {}", repository_root);
             }
-
-            let survey = ask(types);
-
-            let commit_msg = generate_commit_msg(survey);
-            let hash = commit(commit_msg, repository_path).expect("Failed to create commit");
-            println!("Wrote commit: {}", hash);
         } else {
             eprintln!("Please specify allowed scopes inside of your Cargo.toml file under the `package.metadata.cz` key!");
         }
