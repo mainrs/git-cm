@@ -51,12 +51,21 @@ pub fn generate_commit_msg(survey: SurveyResults) -> String {
     };
     match survey.affected_open_issues {
         Some(issue_list) => {
-            let prefix = match &survey.commit_type[..] {
-                "fix" => "Fixes: ",
-                _ => "Referenced issues: ",
+            let footer_key = match &survey.commit_type[..] {
+                "fix" => "Fixes",
+                "feat" => "Closes",
+                _ => "Referenced-issues",
             };
-            format!("{}\n\n{}{}", with_breaking_change, prefix, issue_list)
-        }
+            let mut footer_value = String::new();
+            issue_list.iter().for_each(|s| { footer_value.push_str(s); footer_value.push(' ') });
+
+            let footer_separator = match footer_value.chars().nth(0) {
+                Some('#') => " ",
+                _ => ": ",
+            };
+
+            format!("{}\n\n{}{}{}", with_breaking_change, footer_key, footer_separator, footer_value)
+        },
         None => with_breaking_change,
     }
 }

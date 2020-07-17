@@ -9,7 +9,7 @@ pub struct SurveyResults {
     pub short_msg: String,
     pub long_msg: Option<String>,
     pub breaking_changes_desc: Option<String>,
-    pub affected_open_issues: Option<String>,
+    pub affected_open_issues: Option<Vec<String>>,
 }
 
 impl SurveyResults {
@@ -95,11 +95,14 @@ pub fn ask(types: HashMap<&str, &str>) -> SurveyResults {
         .unwrap();
 
     if are_issues_affected {
-        let affected_open_issues = Input::with_theme(&ColorfulTheme::default())
+        let affected_open_issues: Option<String> = Input::with_theme(&ColorfulTheme::default())
             .with_prompt("Add issue references (e.g. \"fix #123\", \"re #123\"):")
             .interact()
             .ok();
-        results.affected_open_issues = affected_open_issues;
+        results.affected_open_issues = match affected_open_issues {
+            Some(s) => Some(s.split(' ').map(|e| e.to_string()).collect()),
+            None => None,
+        };
     }
 
     results
