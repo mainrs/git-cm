@@ -1,16 +1,20 @@
 use crate::{
+    args::App,
     cargo::parse_manifest,
     git::{commit, generate_commit_msg, DEFAULT_TYPES},
     questions::ask,
 };
-
+use clap::Clap;
 use std::{collections::HashMap, path::PathBuf};
 
+mod args;
 mod cargo;
 mod git;
 mod questions;
 
 fn main() {
+    let _app: App = App::parse();
+
     let manifest = parse_manifest().unwrap();
     if let Some(package) = manifest.package {
         if let Some(metadata) = package.metadata {
