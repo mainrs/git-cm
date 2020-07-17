@@ -1,29 +1,20 @@
-# zerotask-rust-lib-template
+# git-cm
 
 [![docs_master_badge]][docs_master_url]
 
-> A GitHub template for Rust libraries.
+> A git subcommand for creating conventional-friendly commit messages.
 
-## Features
+## Installation
 
-- Continuous Integration through GitHub Actions
-  - Each PR is tested by running the following commands to ensure that only working code is added to the repository:
-    - `cargo fmt` to ensure uniform source code formatting.
-    - `cargo clippy` to use more idiomic Rust code, optimize code as well as prevent hard to spot bugs.
-    - `cargo check` to ensure that the library compiles properly.
-    - `cargo test` to ensure that the library works as expected.
-  - Each push to master triggers the following:
-    - Generation of the newest documentation that gets pushed to the `gh-pages` branch.
-- MSRV (**M**inimal **s**upported **R**ust **v**ersion)
-  - Kept in sync with the latest available Rust version on Ubuntu.
-- Opinioded `rustfmt` configuration file.
-- Misc
-  - `.editorconfig` file for code-unrelated files.
-    - Ensures proper formatting for workflow files and other configuration files.
+Either compile from source or install via [crates.io](https://crates.io):
 
-## Current Properties
+```text
+cargo install git-cm
+```
 
-- MSRV: 1.41.0
+## Usage
+
+Instead of using `git commit` to commit changes, simply run `git cm`. This will start the questioning process and commit the message once you're done.
 
 ## License
 
