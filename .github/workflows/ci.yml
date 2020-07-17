@@ -59,6 +59,12 @@ jobs:
   clippy:
     name: Lint check
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        rust:
+          - stable
+          - 1.41.0
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
@@ -67,6 +73,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
+          toolchain: ${{ matrix.rust }}
           override: true
           components: clippy
 
