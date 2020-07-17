@@ -1,5 +1,18 @@
 [package]
-name = "zerotask-rust-lib-template"
+name = "git-cm"
+description = "A git command that generates conventional-friendly commit messages."
 version = "0.1.0"
 authors = ["Sven Lechner <SirWindfield@users.noreply.github.com>"]
 edition = "2018"
+
+[dependencies]
+anyhow = "1.0.31"
+cargo_toml = "0.8.0"
+console = "0.11.3"
+dialoguer = "0.6.2"
+git2 = "0.13.6"
+once_cell = "1.4.0"
+serde = { version = "1.0.114", features = ["derive"] }
+
+[package.metadata.commits]
+defaults = true
