@@ -34,7 +34,7 @@ pub static DEFAULT_TYPES: Lazy<HashMap<&str, &str>> = Lazy::new(|| {
 pub fn generate_commit_msg(survey: SurveyResults) -> String {
     let commit_type_and_scope = match survey.scope {
         Some(scope) => format!("{}({})", survey.commit_type, scope),
-        None => survey.commit_type,
+        None => survey.commit_type.to_owned(),
     };
     let pre_colon = match survey.breaking_changes_desc {
         Some(_) => format!("{}!", commit_type_and_scope),
@@ -50,7 +50,13 @@ pub fn generate_commit_msg(survey: SurveyResults) -> String {
         None => with_long_msg,
     };
     match survey.affected_open_issues {
-        Some(issue_list) => format!("{}\n\n{}", with_breaking_change, issue_list),
+        Some(issue_list) => {
+            let prefix = match &survey.commit_type[..] {
+                "fix" => "Fixes: ",
+                _ => "Referenced issues: ",
+            };
+            format!("{}\n\n{}{}", with_breaking_change, prefix, issue_list)
+        }
         None => with_breaking_change,
     }
 }
