@@ -29,7 +29,8 @@ pub static DEFAULT_TYPES: Lazy<HashMap<&str, &str>> = Lazy::new(|| {
     m
 });
 
-/// Generates the commit message by selectively appending all parts that the user entered.
+/// Generates the commit message by selectively appending all parts that the
+/// user entered.
 pub fn generate_commit_msg(survey: SurveyResults) -> String {
     let commit_type_and_scope = match survey.scope {
         Some(scope) => format!("{}({})", survey.commit_type, scope),
@@ -73,7 +74,8 @@ fn find_last_commit(repo: &Repository) -> Result<Commit> {
 ///
 /// # Note
 ///
-/// The method uses the default username and email address found for the repository. Defaults to the globally configured when needed.
+/// The method uses the default username and email address found for the
+/// repository. Defaults to the globally configured when needed.
 pub fn commit(msg: String) -> Result<Oid> {
     let repo_root = std::env::args().nth(1).unwrap_or_else(|| ".".to_string());
     let repo = Repository::open(repo_root.as_str()).expect("Failed to open git repository");

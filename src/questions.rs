@@ -23,7 +23,8 @@ impl SurveyResults {
 ///
 /// # Arguments
 ///
-/// - `types`: A `HashMap` whose keys are the commit types and values are the descriptions of the type.
+/// - `types`: A `HashMap` whose keys are the commit types and values are the
+///   descriptions of the type.
 ///
 /// # Returns
 ///

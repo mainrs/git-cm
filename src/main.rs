@@ -1,6 +1,8 @@
-use crate::config::parse_manifest;
-use crate::git::{commit, generate_commit_msg, DEFAULT_TYPES};
-use crate::questions::ask;
+use crate::{
+    config::parse_manifest,
+    git::{commit, generate_commit_msg, DEFAULT_TYPES},
+    questions::ask,
+};
 use std::collections::HashMap;
 
 mod config;
