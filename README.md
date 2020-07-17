@@ -16,6 +16,18 @@ cargo install git-cm
 
 Instead of using `git commit` to commit changes, simply run `git cm`. This will start the questioning process and commit the message once you're done.
 
+You also have to specifiy which types of commits your project supports. Just add the following to your `Cargo.toml`:
+
+```
+[package.metadata.commits]
+defaults = true
+
+# This is optional
+[[package.metadata.commits.type]]
+name = "xyz"
+desc = "A custom command"
+```
+
 ## License
 
 Licensed under either of
