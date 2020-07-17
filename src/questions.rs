@@ -49,7 +49,7 @@ pub fn ask(types: HashMap<&str, &str>) -> SurveyResults {
         .interact()
         .unwrap();
     let selected_commit_type = &type_options[selected_index];
-    results.commit_type = selected_commit_type.0.to_string();
+    results.commit_type = (*selected_commit_type.0).to_string();
 
     let scope = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Denote the scope of this change (compiler, runtime, stdlib, etc.):")
