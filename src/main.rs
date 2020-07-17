@@ -33,7 +33,7 @@ fn main() {
                 let survey = ask(types);
                 let commit_msg = generate_commit_msg(survey);
                 let hash = commit(commit_msg, repository_path).expect("Failed to create commit");
-                println!("Wrote commit: {}", hash);   
+                println!("Wrote commit: {}", hash);
             } else {
                 eprintln!("Invalid path to repository: {}", repository_root);
             }
