@@ -18,7 +18,7 @@ Instead of using `git commit` to commit changes, simply run `git cm`. This will 
 
 You also have to specifiy which types of commits your project supports. Just add the following to your `Cargo.toml`:
 
-```
+```toml
 [package.metadata.commits]
 defaults = true
 
