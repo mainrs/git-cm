@@ -108,17 +108,21 @@ pub fn commit(msg: String, repository: PathBuf) -> Result<Oid> {
     let mut index = repo.index()?;
     let oid = index.write_tree()?;
     let signature = repo.signature()?;
-    let parent_commit = find_last_commit(&repo)?;
-    let tree = repo.find_tree(oid)?;
 
-    let oid = repo.commit(
-        Some("HEAD"),
-        &signature,
-        &signature,
-        &msg,
-        &tree,
-        &[&parent_commit],
-    )?;
+    let tree = repo.find_tree(oid)?;
+    let parent_commit = find_last_commit(&repo);
+
+    let oid = match parent_commit {
+        Ok(parent_commit) => repo.commit(
+            Some("HEAD"),
+            &signature,
+            &signature,
+            &msg,
+            &tree,
+            &[&parent_commit],
+        )?,
+        Err(_) => repo.commit(Some("HEAD"), &signature, &signature, &msg, &tree, &[])?,
+    };
 
     Ok(oid)
 }
