@@ -96,7 +96,7 @@ pub fn ask(types: HashMap<&str, &str>) -> SurveyResults {
 
     if are_issues_affected {
         let affected_open_issues: Option<String> = Input::with_theme(&ColorfulTheme::default())
-            .with_prompt("Add issue references (e.g. \"fix #123\", \"re #123\"):")
+            .with_prompt("Add issue references (space-separated, e.g. \"#123\" or \"12 13\"):")
             .interact()
             .ok();
         results.affected_open_issues = match affected_open_issues {
