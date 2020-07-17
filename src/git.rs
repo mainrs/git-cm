@@ -29,16 +29,19 @@ pub static DEFAULT_TYPES: Lazy<HashMap<&str, &str>> = Lazy::new(|| {
     m
 });
 
-fn format_footer(commit_type: &str, issues_list: &Vec<String>) -> String {
+fn format_footer(commit_type: &str, issues_list: &[String]) -> String {
     let footer_key = match commit_type {
         "fix" => "Fixes",
         "feat" => "Closes",
         _ => "Referenced-issues",
     };
     let mut footer_value = String::new();
-    issues_list.iter().for_each(|s| { footer_value.push_str(s); footer_value.push(' ') });
+    issues_list.iter().for_each(|s| {
+        footer_value.push_str(s);
+        footer_value.push(' ')
+    });
 
-    let footer_separator = match footer_value.chars().nth(0) {
+    let footer_separator = match footer_value.chars().next() {
         Some('#') => " ",
         _ => ": ",
     };
@@ -67,9 +70,11 @@ pub fn generate_commit_msg(survey: SurveyResults) -> String {
         None => with_long_msg,
     };
     match survey.affected_open_issues {
-        Some(issues_list) => {
-            format!("{}\n\n{}", with_breaking_change, format_footer(&survey.commit_type, &issues_list))
-        },
+        Some(issues_list) => format!(
+            "{}\n\n{}",
+            with_breaking_change,
+            format_footer(&survey.commit_type, &issues_list)
+        ),
         None => with_breaking_change,
     }
 }
