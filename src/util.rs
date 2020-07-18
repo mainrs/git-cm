@@ -1,4 +1,5 @@
-/// Iterator yielding every line in a string. The line includes newline character(s).
+/// Iterator yielding every line in a string. The line includes newline
+/// character(s).
 pub struct LinesWithEndings<'a> {
     input: &'a str,
 }
