@@ -1,20 +1,20 @@
 use crate::{
     args::App,
     cargo::parse_manifest,
-    git::{commit, generate_commit_msg, DEFAULT_TYPES},
+    git::{commit_to_repo, generate_commit_msg, DEFAULT_TYPES},
     questions::ask,
 };
 use clap::Clap;
-use std::{collections::HashMap, path::PathBuf};
+use itertools::Itertools;
+use std::{collections::HashMap, path::Path};
 
 mod args;
 mod cargo;
 mod git;
 mod questions;
+mod util;
 
-fn main() {
-    let _app: App = App::parse();
-
+fn run_dialog() -> Option<String> {
     let manifest = parse_manifest().unwrap();
     if let Some(package) = manifest.package {
         if let Some(metadata) = package.metadata {
@@ -31,18 +31,49 @@ fn main() {
                 }
             }
 
-            let repository_root = std::env::args().nth(1).unwrap_or_else(|| ".".to_string());
-            let repository_path = PathBuf::from(&repository_root);
-            if repository_path.as_path().exists() {
-                let survey = ask(types);
-                let commit_msg = generate_commit_msg(survey);
-                let hash = commit(commit_msg, repository_path).expect("Failed to create commit");
-                println!("Wrote commit: {}", hash);
-            } else {
-                eprintln!("Invalid path to repository: {}", repository_root);
-            }
+            let survey = ask(types);
+            return Some(generate_commit_msg(survey));
         } else {
             eprintln!("Please specify allowed scopes inside of your Cargo.toml file under the `package.metadata.cz` key!");
         }
+    }
+
+    None
+}
+
+fn create_commit(commit_msg: &str, repository_path: impl AsRef<Path>) {
+    let hash =
+        commit_to_repo(commit_msg, repository_path.as_ref()).expect("Failed to create commit");
+    println!("Wrote commit: {}", hash);
+}
+
+fn run(app: App) {
+    // We can short-hand the editor mode for now as there aren't type-agnostic
+    let commit_msg = if app.edit {
+        let template = include_str!("../assets/editor_template.txt");
+        edit::edit(template)
+            .ok()
+            .map(|v| {
+                let lines = util::LinesWithEndings::from(&v);
+                lines.filter(|v| !v.starts_with('#')).join("")
+            })
+            .filter(|v| !v.trim().is_empty())
+    } else {
+        run_dialog()
+    };
+
+    match commit_msg {
+        Some(msg) => create_commit(&msg, app.repo_path),
+        None => eprintln!("Empty commit message specified!"),
+    }
+}
+
+fn main() {
+    let app: App = App::parse();
+    // Early return if the path doesn't exist.
+    if !app.repo_path.exists() {
+        eprintln!("Invalid path to repository: {}", app.repo_path.display());
+    } else {
+        run(app);
     }
 }
