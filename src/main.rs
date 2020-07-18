@@ -2,7 +2,7 @@ use crate::{
     args::App,
     cargo::parse_manifest,
     git::{commit_to_repo, generate_commit_msg, DEFAULT_TYPES},
-    questions::ask,
+    questions::{ask, SurveyResults},
 };
 use clap::Clap;
 use itertools::Itertools;
@@ -14,7 +14,7 @@ mod git;
 mod questions;
 mod util;
 
-fn run_dialog() -> Option<String> {
+fn run_dialog() -> Option<SurveyResults> {
     let manifest = parse_manifest().unwrap();
     if let Some(package) = manifest.package {
         if let Some(metadata) = package.metadata {
@@ -31,8 +31,7 @@ fn run_dialog() -> Option<String> {
                 }
             }
 
-            let survey = ask(types);
-            return Some(generate_commit_msg(survey));
+            return Some(ask(types));
         } else {
             eprintln!("Please specify allowed scopes inside of your Cargo.toml file under the `package.metadata.cz` key!");
         }
@@ -59,7 +58,8 @@ fn run(app: App) {
             })
             .filter(|v| !v.trim().is_empty())
     } else {
-        run_dialog()
+        let survey = run_dialog();
+        survey.map(generate_commit_msg)
     };
 
     match commit_msg {
