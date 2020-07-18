@@ -1,9 +1,8 @@
-use crate::questions::SurveyResults;
 use crate::{
     args::App,
     cargo::parse_manifest,
     git::{commit_to_repo, generate_commit_msg, DEFAULT_TYPES},
-    questions::ask,
+    questions::{ask, SurveyResults},
 };
 use clap::Clap;
 use itertools::Itertools;
