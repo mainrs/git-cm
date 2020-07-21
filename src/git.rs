@@ -2,8 +2,7 @@ use crate::questions::SurveyResults;
 use anyhow::{anyhow, Result};
 use git2::{Commit, ObjectType, Oid, Repository, RepositoryOpenFlags};
 use once_cell::sync::Lazy;
-use std::ffi::OsStr;
-use std::{collections::HashMap, path::Path};
+use std::{collections::HashMap, ffi::OsStr, path::Path};
 
 /// All default conventional commit types alongside their description.
 pub static DEFAULT_TYPES: Lazy<HashMap<&str, &str>> = Lazy::new(|| {
