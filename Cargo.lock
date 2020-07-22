@@ -150,7 +150,7 @@ dependencies = [
 
 [[package]]
 name = "git-cm"
-version = "0.1.3"
+version = "0.1.4"
 dependencies = [
  "anyhow",
  "cargo_toml",
@@ -166,9 +166,9 @@ dependencies = [
 
 [[package]]
 name = "git2"
-version = "0.13.6"
+version = "0.13.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "11e4b2082980e751c4bf4273e9cbb4a02c655729c8ee8a79f66cad03c8f4d31e"
+checksum = "e6ac22e49b7d886b6802c66662b12609452248b1bc9e87d6d83ecea3db96f557"
 dependencies = [
  "bitflags",
  "libc",
@@ -253,15 +253,15 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.72"
+version = "0.2.73"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9f8082297d534141b30c8d39e9b1773713ab50fdbe4ff30f750d063b3bfd701"
+checksum = "bd7d4bd64732af4bf3a67f367c27df8520ad7e230c5817b8ff485864d80242b9"
 
 [[package]]
 name = "libgit2-sys"
-version = "0.12.7+1.0.0"
+version = "0.12.9+1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bcd07968649bcb7b9351ecfde53ca4d27673cccfdf57c84255ec18710f3153e0"
+checksum = "9b33bf3d9d4c45b48ae1ea7c334be69994624dc0a69f833d5d9f7605f24b552b"
 dependencies = [
  "cc",
  "libc",
@@ -389,9 +389,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.18"
+version = "1.0.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "beae6331a816b1f65d04c45b078fd8e6c93e8071771f41b8163255bbd8d7c8fa"
+checksum = "04f5f085b5d71e2188cb8271e5da0161ad52c3f227a661a3c135fdf28e258b12"
 dependencies = [
  "unicode-xid",
 ]
@@ -504,9 +504,9 @@ checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
 name = "syn"
-version = "1.0.34"
+version = "1.0.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "936cae2873c940d92e697597c5eee105fb570cd5689c695806f672883653349b"
+checksum = "fb7f4c519df8c117855e19dd8cc851e89eb746fe7a73f0157e0d95fdec5369b0"
 dependencies = [
  "proc-macro2",
  "quote",
