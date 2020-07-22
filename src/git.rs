@@ -1,8 +1,8 @@
 use crate::questions::SurveyResults;
 use anyhow::{anyhow, Result};
-use git2::{Commit, ObjectType, Oid, Repository};
+use git2::{Commit, ObjectType, Oid, Repository, RepositoryOpenFlags};
 use once_cell::sync::Lazy;
-use std::{collections::HashMap, path::Path};
+use std::{collections::HashMap, ffi::OsStr, path::Path};
 
 /// All default conventional commit types alongside their description.
 pub static DEFAULT_TYPES: Lazy<HashMap<&str, &str>> = Lazy::new(|| {
@@ -103,8 +103,12 @@ fn find_last_commit(repo: &Repository) -> Result<Commit> {
 /// The method uses the default username and email address found for the
 /// repository. Defaults to the globally configured when needed.
 pub fn commit_to_repo(msg: &str, repository: impl AsRef<Path>) -> Result<Oid> {
-    let repo =
-        Repository::open(repository.as_ref().as_os_str()).expect("Failed to open git repository");
+    let repo = Repository::open_ext(
+        repository.as_ref().as_os_str(),
+        RepositoryOpenFlags::empty(),
+        vec![OsStr::new("")],
+    )
+    .expect("Failed to open git repository");
 
     let mut index = repo.index()?;
     let oid = index.write_tree()?;
