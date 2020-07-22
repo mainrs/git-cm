@@ -5,8 +5,9 @@ use crate::{
     questions::{ask, SurveyResults},
 };
 use clap::Clap;
+use git2::{Repository, RepositoryOpenFlags, Status};
 use itertools::Itertools;
-use std::{collections::HashMap, path::Path};
+use std::{collections::HashMap, ffi::OsStr};
 
 mod args;
 mod cargo;
@@ -40,13 +41,33 @@ fn run_dialog() -> Option<SurveyResults> {
     None
 }
 
-fn create_commit(commit_msg: &str, repository_path: impl AsRef<Path>) {
-    let hash =
-        commit_to_repo(commit_msg, repository_path.as_ref()).expect("Failed to create commit");
+fn create_commit(commit_msg: &str, repo: &Repository) {
+    let hash = commit_to_repo(commit_msg, repo).expect("Failed to create commit");
     println!("Wrote commit: {}", hash);
 }
 
 fn run(app: App) {
+    // No point doing anything if we're not in a Git repo
+    //let repo_path: Path = app.repo_path;
+    let repo = Repository::open_ext(
+        app.repo_path.as_path().as_os_str(),
+        RepositoryOpenFlags::empty(),
+        vec![OsStr::new("")],
+    )
+    .expect("Failed to open git repository");
+
+    // No point doing anything if there are no staged files
+    match repo.statuses(Option::None) {
+        Ok(s) => {
+            if s.iter().fold(true, |acc, se| {
+                acc & ((se.status() == Status::CURRENT) | (se.status() == Status::IGNORED))
+            }) {
+                panic!("Error: nothing to commit")
+            }
+        }
+        Err(e) => panic!("Error: {}", e),
+    };
+
     // We can short-hand the editor mode for now as there aren't type-agnostic
     let commit_msg = if app.edit {
         let template = include_str!("../assets/editor_template.txt");
@@ -63,7 +84,7 @@ fn run(app: App) {
     };
 
     match commit_msg {
-        Some(msg) => create_commit(&msg, app.repo_path),
+        Some(msg) => create_commit(&msg, &repo),
         None => eprintln!("Empty commit message specified!"),
     }
 }
