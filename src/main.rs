@@ -1,7 +1,10 @@
 use crate::{
     args::App,
     cargo::parse_manifest,
-    git::{commit_to_repo, generate_commit_msg, DEFAULT_TYPES},
+    git::{
+        check_staged_files_exist, commit_to_repo, generate_commit_msg, get_repository,
+        DEFAULT_TYPES,
+    },
     questions::{ask, SurveyResults},
 };
 use clap::Clap;
@@ -13,8 +16,6 @@ mod cargo;
 mod git;
 mod questions;
 mod util;
-
-use git::{check_staged_files_exist, get_repository};
 
 fn run_dialog() -> Option<SurveyResults> {
     let manifest = parse_manifest().unwrap();
