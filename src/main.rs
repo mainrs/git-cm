@@ -5,15 +5,16 @@ use crate::{
     questions::{ask, SurveyResults},
 };
 use clap::Clap;
-use git2::{Repository, RepositoryOpenFlags, Status};
 use itertools::Itertools;
-use std::{collections::HashMap, ffi::OsStr};
+use std::{collections::HashMap, path::Path};
 
 mod args;
 mod cargo;
 mod git;
 mod questions;
 mod util;
+
+use git::{check_staged_files_exist, get_repository};
 
 fn run_dialog() -> Option<SurveyResults> {
     let manifest = parse_manifest().unwrap();
@@ -41,58 +42,42 @@ fn run_dialog() -> Option<SurveyResults> {
     None
 }
 
-fn create_commit(commit_msg: &str, repo: &Repository) {
+fn create_commit(commit_msg: &str, repo: &Path) {
     let hash = commit_to_repo(commit_msg, repo).expect("Failed to create commit");
     println!("Wrote commit: {}", hash);
 }
 
 fn run(app: App) {
-    // No point doing anything if we're not in a Git repo
-    //let repo_path: Path = app.repo_path;
-    let repo = Repository::open_ext(
-        app.repo_path.as_path().as_os_str(),
-        RepositoryOpenFlags::empty(),
-        vec![OsStr::new("")],
-    )
-    .expect("Failed to open git repository");
+    // No point to continue if repo doesn't exist or there are no staged files
+    if check_staged_files_exist(app.repo_path.as_path()) {
+        // We can short-hand the editor mode for now as there aren't type-agnostic
+        let commit_msg = if app.edit {
+            let template = include_str!("../assets/editor_template.txt");
+            edit::edit(template)
+                .ok()
+                .map(|v| {
+                    let lines = util::LinesWithEndings::from(&v);
+                    lines.filter(|v| !v.starts_with('#')).join("")
+                })
+                .filter(|v| !v.trim().is_empty())
+        } else {
+            let survey = run_dialog();
+            survey.map(generate_commit_msg)
+        };
 
-    // No point doing anything if there are no staged files
-    match repo.statuses(Option::None) {
-        Ok(s) => {
-            if s.iter().fold(true, |acc, se| {
-                acc & ((se.status() == Status::CURRENT) | (se.status() == Status::IGNORED))
-            }) {
-                panic!("Error: nothing to commit")
-            }
+        match commit_msg {
+            Some(msg) => create_commit(&msg, app.repo_path.as_path()),
+            None => eprintln!("Empty commit message specified!"),
         }
-        Err(e) => panic!("Error: {}", e),
-    };
-
-    // We can short-hand the editor mode for now as there aren't type-agnostic
-    let commit_msg = if app.edit {
-        let template = include_str!("../assets/editor_template.txt");
-        edit::edit(template)
-            .ok()
-            .map(|v| {
-                let lines = util::LinesWithEndings::from(&v);
-                lines.filter(|v| !v.starts_with('#')).join("")
-            })
-            .filter(|v| !v.trim().is_empty())
     } else {
-        let survey = run_dialog();
-        survey.map(generate_commit_msg)
-    };
-
-    match commit_msg {
-        Some(msg) => create_commit(&msg, &repo),
-        None => eprintln!("Empty commit message specified!"),
+        eprintln!("Nothing to commit!");
     }
 }
 
 fn main() {
     let app: App = App::parse();
     // Early return if the path doesn't exist.
-    if !app.repo_path.exists() {
+    if !app.repo_path.exists() || get_repository(app.repo_path.as_path()).is_err() {
         eprintln!("Invalid path to repository: {}", app.repo_path.display());
     } else {
         run(app);
