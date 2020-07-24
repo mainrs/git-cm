@@ -1,7 +1,10 @@
 use crate::{
     args::App,
     cargo::parse_manifest,
-    git::{commit_to_repo, generate_commit_msg, DEFAULT_TYPES},
+    git::{
+        check_staged_files_exist, commit_to_repo, generate_commit_msg, get_repository,
+        DEFAULT_TYPES,
+    },
     questions::{ask, SurveyResults},
 };
 use clap::Clap;
@@ -40,38 +43,42 @@ fn run_dialog() -> Option<SurveyResults> {
     None
 }
 
-fn create_commit(commit_msg: &str, repository_path: impl AsRef<Path>) {
-    let hash =
-        commit_to_repo(commit_msg, repository_path.as_ref()).expect("Failed to create commit");
+fn create_commit(commit_msg: &str, repo: &Path) {
+    let hash = commit_to_repo(commit_msg, repo).expect("Failed to create commit");
     println!("Wrote commit: {}", hash);
 }
 
 fn run(app: App) {
-    // We can short-hand the editor mode for now as there aren't type-agnostic
-    let commit_msg = if app.edit {
-        let template = include_str!("../assets/editor_template.txt");
-        edit::edit(template)
-            .ok()
-            .map(|v| {
-                let lines = util::LinesWithEndings::from(&v);
-                lines.filter(|v| !v.starts_with('#')).join("")
-            })
-            .filter(|v| !v.trim().is_empty())
-    } else {
-        let survey = run_dialog();
-        survey.map(generate_commit_msg)
-    };
+    // No point to continue if repo doesn't exist or there are no staged files
+    if check_staged_files_exist(app.repo_path.as_path()) {
+        // We can short-hand the editor mode for now as there aren't type-agnostic
+        let commit_msg = if app.edit {
+            let template = include_str!("../assets/editor_template.txt");
+            edit::edit(template)
+                .ok()
+                .map(|v| {
+                    let lines = util::LinesWithEndings::from(&v);
+                    lines.filter(|v| !v.starts_with('#')).join("")
+                })
+                .filter(|v| !v.trim().is_empty())
+        } else {
+            let survey = run_dialog();
+            survey.map(generate_commit_msg)
+        };
 
-    match commit_msg {
-        Some(msg) => create_commit(&msg, app.repo_path),
-        None => eprintln!("Empty commit message specified!"),
+        match commit_msg {
+            Some(msg) => create_commit(&msg, app.repo_path.as_path()),
+            None => eprintln!("Empty commit message specified!"),
+        }
+    } else {
+        eprintln!("Nothing to commit!");
     }
 }
 
 fn main() {
     let app: App = App::parse();
     // Early return if the path doesn't exist.
-    if !app.repo_path.exists() {
+    if !app.repo_path.exists() || get_repository(app.repo_path.as_path()).is_err() {
         eprintln!("Invalid path to repository: {}", app.repo_path.display());
     } else {
         run(app);

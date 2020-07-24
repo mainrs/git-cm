@@ -1,8 +1,8 @@
 use crate::questions::SurveyResults;
 use anyhow::{anyhow, Result};
-use git2::{Commit, ObjectType, Oid, Repository, RepositoryOpenFlags};
-use once_cell::sync::Lazy;
-use std::{collections::HashMap, ffi::OsStr, path::Path};
+use git2::{Commit, Error, ObjectType, Oid, Repository, RepositoryOpenFlags, Status};
+use once_cell::sync::{Lazy, OnceCell};
+use std::{collections::HashMap, ffi::OsStr, path::Path, sync::Mutex};
 
 /// All default conventional commit types alongside their description.
 pub static DEFAULT_TYPES: Lazy<HashMap<&str, &str>> = Lazy::new(|| {
@@ -28,6 +28,42 @@ pub static DEFAULT_TYPES: Lazy<HashMap<&str, &str>> = Lazy::new(|| {
 
     m
 });
+
+// Singleton pattern
+pub fn get_repository(repo: &Path) -> Result<&Mutex<Repository>, Error> {
+    static REPO: OnceCell<Mutex<Repository>> = OnceCell::new();
+    REPO.get_or_try_init(|| {
+        let repo = Repository::open_ext(
+            repo.as_os_str(),
+            RepositoryOpenFlags::empty(),
+            vec![OsStr::new("")],
+        );
+        match repo {
+            Ok(r) => Ok(Mutex::new(r)),
+            Err(e) => Err(e),
+        }
+    })
+}
+
+pub fn check_staged_files_exist(repo: &Path) -> bool {
+    let res;
+    let repo = get_repository(repo).unwrap().lock().unwrap();
+    match repo.statuses(Option::None) {
+        Ok(s) => {
+            res = s.iter().fold(false, |acc, se| {
+                acc | se.status().intersects(
+                    Status::INDEX_NEW
+                        | Status::INDEX_MODIFIED
+                        | Status::INDEX_DELETED
+                        | Status::INDEX_RENAMED
+                        | Status::INDEX_TYPECHANGE,
+                )
+            });
+        }
+        Err(e) => panic!("Error: {}", e),
+    };
+    res
+}
 
 fn format_footer(commit_type: &str, issues_list: &[String]) -> String {
     let footer_key = match commit_type {
@@ -102,14 +138,8 @@ fn find_last_commit(repo: &Repository) -> Result<Commit> {
 ///
 /// The method uses the default username and email address found for the
 /// repository. Defaults to the globally configured when needed.
-pub fn commit_to_repo(msg: &str, repository: impl AsRef<Path>) -> Result<Oid> {
-    let repo = Repository::open_ext(
-        repository.as_ref().as_os_str(),
-        RepositoryOpenFlags::empty(),
-        vec![OsStr::new("")],
-    )
-    .expect("Failed to open git repository");
-
+pub fn commit_to_repo(msg: &str, repo: &Path) -> Result<Oid> {
+    let repo = get_repository(repo).unwrap().lock().unwrap();
     let mut index = repo.index()?;
     let oid = index.write_tree()?;
     let signature = repo.signature()?;
