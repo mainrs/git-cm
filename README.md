@@ -9,7 +9,7 @@
 Either compile from source or install via [crates.io](https://crates.io):
 
 ```text
-cargo install git-cm
+cargo install git-cm --locked
 ```
 
 ## Usage
