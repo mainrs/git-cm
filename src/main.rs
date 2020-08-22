@@ -7,10 +7,12 @@ use crate::{
     },
     questions::{ask, SurveyResults},
 };
+use anyhow::{Error, Result};
 use clap::Clap;
+use dialoguer::{theme::ColorfulTheme, Confirm};
 use itertools::Itertools;
+use self_update::{cargo_crate_version, version::bump_is_greater};
 use std::{collections::HashMap, path::Path};
-
 mod args;
 mod cargo;
 mod git;
@@ -48,7 +50,62 @@ fn create_commit(commit_msg: &str, repo: &Path) {
     println!("Wrote commit: {}", hash);
 }
 
+fn update_app() -> Result<(), Error> {
+    // Check if the latest release published is newer than the actual one which
+    // is currently being used.
+    match look_for_new_release() {
+        Ok(None) => Ok(()),
+        Ok(Some(_)) => {
+            let want_to_bump = Confirm::with_theme(&ColorfulTheme::default())
+                .with_prompt(
+                    "A newer version for this crate was found.\nWould you like to update your application?"
+                )
+                .default(false)
+                .interact()?;
+            if want_to_bump == true {
+                let status = self_update::backends::github::Update::configure()
+                    .repo_owner("SirWindfield")
+                    .repo_name("git-cm")
+                    .bin_name("git-cm")
+                    .show_download_progress(true)
+                    .show_output(true)
+                    .current_version(cargo_crate_version!())
+                    .build()?
+                    .update()?;
+                println!(
+                    "You've sucessfully updated your version to `{}`!",
+                    status.version()
+                );
+                Ok(())
+            } else {
+                Ok(())
+            }
+        }
+        Err(e) => Err(e),
+    }
+}
+
+fn look_for_new_release() -> Result<Option<String>> {
+    let releases = self_update::backends::github::ReleaseList::configure()
+        .repo_owner("SirWindfield")
+        .repo_name("git-cm")
+        .build()?
+        .fetch()?;
+    if bump_is_greater(cargo_crate_version!(), &releases[0].version)? {
+        Ok(Some(releases[0].version.to_string()))
+    } else {
+        Ok(None)
+    }
+}
+
 fn run(app: App) {
+    // Check if there's a new release of the crate. In that case, ask the user
+    // if he/she wants to update it.
+    match update_app() {
+        Ok(()) => (),
+        Err(e) => eprintln!("An error ocurred during the app update process: {}", e),
+    };
+
     // No point to continue if repo doesn't exist or there are no staged files
     if check_staged_files_exist(app.repo_path.as_path()) {
         // We can short-hand the editor mode for now as there aren't type-agnostic
