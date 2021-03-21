@@ -8,14 +8,12 @@ use crate::{
     questions::{ask, SurveyResults},
 };
 use clap::Clap;
-use itertools::Itertools;
 use std::{collections::HashMap, path::Path};
 
 mod args;
 mod cargo;
 mod git;
 mod questions;
-mod util;
 
 fn run_dialog() -> Option<SurveyResults> {
     let manifest = parse_manifest().unwrap();
@@ -51,20 +49,14 @@ fn create_commit(commit_msg: &str, repo: &Path) {
 fn run(app: App) {
     // No point to continue if repo doesn't exist or there are no staged files
     if check_staged_files_exist(app.repo_path.as_path()) {
-        // We can short-hand the editor mode for now as there aren't type-agnostic
-        let commit_msg = if app.edit {
-            let template = include_str!("../assets/editor_template.txt");
-            edit::edit(template)
-                .ok()
-                .map(|v| {
-                    let lines = util::LinesWithEndings::from(&v);
-                    lines.filter(|v| !v.starts_with('#')).join("")
-                })
-                .filter(|v| !v.trim().is_empty())
-        } else {
-            let survey = run_dialog();
-            survey.map(generate_commit_msg)
-        };
+        let survey = run_dialog();
+        let commit_msg = survey.map(generate_commit_msg).and_then(|msg| {
+            if app.edit {
+                edit::edit(msg).ok()
+            } else {
+                Some(msg)
+            }
+        });
 
         match commit_msg {
             Some(msg) => create_commit(&msg, app.repo_path.as_path()),

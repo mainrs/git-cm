@@ -4,8 +4,7 @@ use std::path::PathBuf;
 #[derive(Clap, Debug)]
 #[clap(author, version)]
 pub struct App {
-    /// Opens the user's editor to type the commit message instead of showing a
-    /// dialog.
+    /// Opens the user's editor after the questioning process.
     #[clap(long, short = 'e')]
     pub edit: bool,
     /// The path to a git repository.
