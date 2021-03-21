@@ -37,9 +37,6 @@ jobs:
       matrix:
         rust:
           - stable
-          - beta
-          - nightly
-          - 1.41.0
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
@@ -64,7 +61,6 @@ jobs:
       matrix:
         rust:
           - stable
-          - 1.41.0
     steps:
       - name: Checkout sources
         uses: actions/checkout@v2
