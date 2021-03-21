@@ -13,7 +13,7 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0.31"
-cargo_toml = "0.8.0"
+cargo_toml = "0.8.1"
 clap = "3.0.0-beta.1"
 console = "0.14.1"
 dialoguer = "0.6.2"
