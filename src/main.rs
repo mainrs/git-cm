@@ -73,6 +73,15 @@ fn main() {
     if !app.repo_path.exists() || get_repository(app.repo_path.as_path()).is_err() {
         eprintln!("Invalid path to repository: {}", app.repo_path.display());
     } else {
+        // When terminating the CLI during the dialoguer phase, the cursor will be
+        // hidden. The callback here makes sure that the cursor is visible in these
+        // cases.
+        let _ = ctrlc::set_handler(move || {
+            let term = dialoguer::console::Term::stderr();
+            let _ = term.show_cursor();
+            std::process::exit(1);
+        });
+
         run(app);
     }
 }
