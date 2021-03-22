@@ -6,8 +6,14 @@
 
 Either compile from source or install via [crates.io](https://crates.io):
 
-```text
-cargo install git-cm --locked
+```console
+$ cargo install git-cm --locked
+```
+
+For macOS, you can install `git-cm` via homebrew:
+
+```console
+$ brew install sirwindfield/tap/git-cm
 ```
 
 ## Usage
