@@ -54,7 +54,7 @@ pub fn ask(types: HashMap<&str, &str>) -> SurveyResults {
     let scope = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Denote the scope of this change (compiler, runtime, stdlib, etc.):")
         .allow_empty(true)
-        .interact()
+        .interact_text()
         .ok()
         .filter(|v: &String| !v.is_empty());
     results.scope = scope;
@@ -62,14 +62,14 @@ pub fn ask(types: HashMap<&str, &str>) -> SurveyResults {
     let short_msg: String = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Write a short, imperative tense description of the change:")
         .allow_empty(true)
-        .interact()
+        .interact_text()
         .unwrap();
     results.short_msg = short_msg;
 
     let long_msg: Option<String> = Input::with_theme(&ColorfulTheme::default())
         .with_prompt("Provide a longer description of the change:")
         .allow_empty(true)
-        .interact()
+        .interact_text()
         .ok()
         .filter(|v: &String| !v.is_empty());
     results.long_msg = long_msg;
@@ -83,7 +83,7 @@ pub fn ask(types: HashMap<&str, &str>) -> SurveyResults {
     if is_breaking_change {
         let breaking_changes_desc = Input::with_theme(&ColorfulTheme::default())
             .with_prompt("Describe the breaking changes:")
-            .interact()
+            .interact_text()
             .ok();
         results.breaking_changes_desc = breaking_changes_desc;
     }
@@ -97,7 +97,7 @@ pub fn ask(types: HashMap<&str, &str>) -> SurveyResults {
     if are_issues_affected {
         let affected_open_issues: Option<String> = Input::with_theme(&ColorfulTheme::default())
             .with_prompt("Add issue references (space-separated, e.g. \"#123\" or \"12 13\"):")
-            .interact()
+            .interact_text()
             .ok();
         results.affected_open_issues = match affected_open_issues {
             Some(s) => Some(s.split(' ').map(|e| e.to_string()).collect()),
