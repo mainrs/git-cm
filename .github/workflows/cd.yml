@@ -77,7 +77,7 @@ jobs:
         env:
           COMMITTER_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         with:
-          homebrew-tap: sirwindfield/tap
+          homebrew-tap: sirwindfield/homebrew-tap
           formula-name: git-cm
           commit-message: |
             chore: update {{ formulaName }} to {{ version }}
