@@ -92,3 +92,10 @@ jobs:
         uses: peter-evans/create-pull-request@v3.8.2
         with:
           delete-branch: true
+
+      - name: Publish to crates.io
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions-rs/cargo@v1
+        with:
+          command: publish
+          args: --token ${{ secrets.CRATES_IO_TOKEN }}
