@@ -71,6 +71,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Create new branch to update brew formula
+        if: "matrix.os == 'macos-latest' && !contains(github.ref, '-')" # skip prereleases
+        run: git checkout -b chore/${{ github.event.repository.name }}
+
       - name: Bump sirwindfield/homebrew-tap formula
         uses: mislav/bump-homebrew-formula-action@v1
         if: "matrix.os == 'macos-latest' && !contains(github.ref, '-')" # skip prereleases
@@ -79,5 +83,12 @@ jobs:
         with:
           homebrew-tap: sirwindfield/homebrew-tap
           formula-name: git-cm
+          base-branch: chore/${{ github.event.repository.name }}
           commit-message: |
-            chore: update {{ formulaName }} to {{ version }}
+            {{formulaName}} {{version}}
+
+      - name: Create Pull Request
+        if: "matrix.os == 'macos-latest' && !contains(github.ref, '-')" # skip prereleases
+        uses: peter-evans/create-pull-request@v3.8.2
+        with:
+          delete-branch: true
