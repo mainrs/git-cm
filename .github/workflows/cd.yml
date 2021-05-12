@@ -95,7 +95,7 @@ jobs:
 
       - name: Publish to crates.io
         if: matrix.os == 'ubuntu-latest'
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/cargo@v1.0.3
         with:
           command: publish
           args: --allow-dirty --token ${{ secrets.CRATES_IO_TOKEN }}

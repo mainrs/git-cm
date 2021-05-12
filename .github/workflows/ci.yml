@@ -24,7 +24,7 @@ jobs:
           components: rustfmt
 
       - name: Check formatting
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/cargo@v1.0.3
         with:
           command: fmt
           args: -- --check
@@ -49,7 +49,7 @@ jobs:
           override: true
 
       - name: Run cargo check
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/cargo@v1.0.3
         with:
           command: check
 
@@ -74,7 +74,7 @@ jobs:
           components: clippy
 
       - name: Run lints
-        uses: actions-rs/cargo@v1
+        uses: actions-rs/cargo@v1.0.3
         with:
           command: clippy
           args: -- -D warnings
