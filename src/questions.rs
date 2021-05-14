@@ -99,10 +99,8 @@ pub fn ask(types: HashMap<&str, &str>) -> SurveyResults {
             .with_prompt("Add issue references (space-separated, e.g. \"#123\" or \"12 13\"):")
             .interact_text()
             .ok();
-        results.affected_open_issues = match affected_open_issues {
-            Some(s) => Some(s.split(' ').map(|e| e.to_string()).collect()),
-            None => None,
-        };
+        results.affected_open_issues =
+            affected_open_issues.map(|s| s.split(' ').map(|e| e.to_string()).collect());
     }
 
     results
