@@ -15,7 +15,7 @@ edition = "2018"
 defaults = true
 
 [dependencies]
-anyhow = "1.0.40"
+anyhow = "1.0.42"
 cargo_toml = "0.9.1"
 clap = "3.0.0-beta.2"
 console = "0.14.1"
