@@ -4,6 +4,9 @@ use std::path::PathBuf;
 #[derive(Clap, Debug)]
 #[clap(author, version)]
 pub struct App {
+    /// Uses default commit types, Cargo.toml requires no changes.
+    #[clap(long, short = 'd')]
+    pub default: bool,
     /// Opens the user's editor after the questioning process.
     #[clap(long, short = 'e')]
     pub edit: bool,

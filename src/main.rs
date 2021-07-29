@@ -15,7 +15,7 @@ mod cargo;
 mod git;
 mod questions;
 
-fn run_dialog() -> Option<SurveyResults> {
+fn run_dialog(app: &App) -> Option<SurveyResults> {
     let manifest = parse_manifest().unwrap();
     if let Some(package) = manifest.package {
         if let Some(metadata) = package.metadata {
@@ -33,8 +33,11 @@ fn run_dialog() -> Option<SurveyResults> {
             }
 
             return Some(ask(types));
+        } else if app.default {
+            // Use default scopes only.
+            return Some(ask(DEFAULT_TYPES.clone()));
         } else {
-            eprintln!("Please specify allowed scopes inside of your Cargo.toml file under the `package.metadata.cz` key!");
+            eprintln!("Please specify allowed scopes inside of your Cargo.toml file under the `package.metadata.commits` key!");
         }
     }
 
@@ -49,7 +52,7 @@ fn create_commit(commit_msg: &str, repo: &Path) {
 fn run(app: App) {
     // No point to continue if repo doesn't exist or there are no staged files
     if check_staged_files_exist(app.repo_path.as_path()) {
-        let survey = run_dialog();
+        let survey = run_dialog(&app);
         let commit_msg = survey.map(generate_commit_msg).and_then(|msg| {
             if app.edit {
                 edit::edit(msg).ok()
