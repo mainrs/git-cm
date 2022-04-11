@@ -89,7 +89,7 @@ jobs:
 
       - name: Create Pull Request
         if: "matrix.os == 'macos-latest' && !contains(github.ref, '-')" # skip prereleases
-        uses: peter-evans/create-pull-request@v3.10.0
+        uses: peter-evans/create-pull-request@v4.0.2
         with:
           delete-branch: true
 
