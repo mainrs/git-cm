@@ -7,7 +7,7 @@ use crate::{
     },
     questions::{ask, SurveyResults},
 };
-use clap::Clap;
+use clap::Parser;
 use std::{collections::HashMap, path::Path};
 
 mod args;
