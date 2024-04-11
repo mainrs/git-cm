@@ -76,7 +76,7 @@ jobs:
         run: git checkout -b chore/${{ github.event.repository.name }}
 
       - name: Bump sirwindfield/homebrew-tap formula
-        uses: mislav/bump-homebrew-formula-action@v1
+        uses: mislav/bump-homebrew-formula-action@v3
         if: "matrix.os == 'macos-latest' && !contains(github.ref, '-')" # skip prereleases
         env:
           COMMITTER_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
