@@ -17,7 +17,7 @@ defaults = true
 [dependencies]
 anyhow = "1.0.40"
 cargo_toml = "0.19.2"
-clap = { version = "4.5.4", features = ["derive"] }
+clap = { version = "4.5.6", features = ["derive"] }
 console = "0.15.8"
 ctrlc = { version = "3.1.9", features = ["termination"] }
 dialoguer = "0.11.0"
